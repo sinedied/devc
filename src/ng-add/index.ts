@@ -10,16 +10,13 @@ import {
   Tree,
   url,
 } from "@angular-devkit/schematics";
-import { applyMods } from "../mods/mod";
-import { Schema } from "./schema";
+import { getPackageManager } from "./util";
+import { applyMods } from "../mod";
 
 // You don't have to export the function as default. You can also have more than one rule factory
 // per file.
-export default function generate(options: Schema): Rule {
+export default function generate(options: any): Rule {
   return (tree: Tree, context: SchematicContext) => {
-    console.log(options);
-    const packageManager = options.packageManager || "npm";
-
     const templateSource = apply(url("../../template"), [
       template({ ...options, ...strings }),
     ]);
@@ -32,7 +29,7 @@ export default function generate(options: Schema): Rule {
   };
 }
 
-function applyModsRule(options: Schema): Rule {
+function applyModsRule(_options: any): Rule {
   return (tree: Tree, _context: SchematicContext) => {
     const json = tree.read(".devcontainer/devcontainer.json");
     if (!json) {
@@ -46,10 +43,8 @@ function applyModsRule(options: Schema): Rule {
       json: json.toString(),
       container: container.toString(),
     };
-    const packageManager = options.packageManager || "npm";
-    // TODO: use correct package manager
-
-    const newData = applyMods(["angular", "npm"], data);
+    const packageManager = getPackageManager(tree);
+    const newData = applyMods(["angular", packageManager], data);
     tree.overwrite(".devcontainer/devcontainer.json", newData.json);
     tree.overwrite(".devcontainer/Dockerfile", newData.container);
   };

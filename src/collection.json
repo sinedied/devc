@@ -4,8 +4,8 @@
     "ng-add": {
       "description": "Adds .devcontainer configuration to your project",
       "factory": "./ng-add/index",
-      "schema": "./ng-add/schema.json",
-      "aliases": ["devc"]
+      "aliases": ["devc"],
+      "save": false
     }
   }
 }

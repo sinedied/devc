@@ -1,10 +1,10 @@
-import * as mods from "./index";
+import * as mods from "./mods/index";
 
-export default interface Mod {
+export interface Mod {
   forwardPorts?: number[];
   extensions?: string[];
   postCreateCommand?: string;
-  packages?: string[];
+  globalPackages?: string[];
   extraContainerSetup?: string;
 }
 
@@ -21,14 +21,14 @@ export function applyMods(
   let forwardPorts: number[] = [];
   let extensions: string[] = [];
   let postCreateCommand: string[] = [];
-  let packages: string[] = [];
+  let globalPackages: string[] = [];
   let extraContainerSetup: string[] = [];
 
   for (const mod of modsToApply) {
     forwardPorts = forwardPorts.concat(mod.forwardPorts || []);
     extensions = extensions.concat(mod.extensions || []);
     postCreateCommand = postCreateCommand.concat(mod.postCreateCommand || []);
-    packages = packages.concat(mod.packages || []);
+    globalPackages = globalPackages.concat(mod.globalPackages || []);
     extraContainerSetup = extraContainerSetup.concat(
       mod.extraContainerSetup || []
     );
@@ -38,7 +38,7 @@ export function applyMods(
     forwardPorts,
     extensions,
     postCreateCommand,
-    packages,
+    globalPackages,
     extraContainerSetup,
   });
 
@@ -61,10 +61,10 @@ export function applyMods(
       `"postCreateCommand": "${postCreateCommand.join(" && ")}",`
     );
   }
-  if (packages.length > 0) {
+  if (globalPackages.length > 0) {
     newData.container = newData.container.replace(
       `# RUN su node -c "npm install -g <your-package-list-here>"`,
-      `RUN su node -c "npm install -g ${packages.join(" ")}"`
+      `RUN su node -c "npm install -g ${globalPackages.join(" ")}"`
     );
   }
   if (extraContainerSetup.length > 0) {
