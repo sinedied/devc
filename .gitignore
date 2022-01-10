@@ -1,9 +1,6 @@
 
 # Outputs
 lib/
-src/**/*.js
-src/**/*.js.map
-src/**/*.d.ts
 
 # IDEs
 .idea/
@@ -15,6 +12,7 @@ node_modules/
 npm-debug.log*
 yarn-error.log*
 test/
+temp/
 TODO
 
 # Mac OSX Finder files.
