@@ -1,4 +1,4 @@
-import { strings } from "@angular-devkit/core";
+import { strings } from '@angular-devkit/core';
 import {
   apply,
   chain,
@@ -8,17 +8,17 @@ import {
   SchematicContext,
   template,
   Tree,
-  url,
-} from "@angular-devkit/schematics";
-import { getPackageManager } from "./util";
-import { applyMods } from "../mod";
+  url
+} from '@angular-devkit/schematics';
+import { applyMods } from '../mod.js';
+import { getPackageManager } from './util.js';
 
 // You don't have to export the function as default. You can also have more than one rule factory
 // per file.
 export default function generate(options: any): Rule {
   return (tree: Tree, context: SchematicContext) => {
-    const templateSource = apply(url("../../template"), [
-      template({ ...options, ...strings }),
+    const templateSource = apply(url('../../template'), [
+      template({ ...options, ...strings })
     ]);
     const generateTemplateRule = mergeWith(
       templateSource,
@@ -31,21 +31,23 @@ export default function generate(options: any): Rule {
 
 function applyModsRule(_options: any): Rule {
   return (tree: Tree, _context: SchematicContext) => {
-    const json = tree.read(".devcontainer/devcontainer.json");
+    const json = tree.read('.devcontainer/devcontainer.json');
     if (!json) {
-      throw new Error("Missing devcontainer.json");
+      throw new Error('Missing devcontainer.json');
     }
-    const container = tree.read(".devcontainer/Dockerfile");
+
+    const container = tree.read('.devcontainer/Dockerfile');
     if (!container) {
-      throw new Error("Missing Dockerfile");
+      throw new Error('Missing Dockerfile');
     }
+
     const data = {
       json: json.toString(),
-      container: container.toString(),
+      container: container.toString()
     };
     const packageManager = getPackageManager(tree);
-    const newData = applyMods(["angular", packageManager], data);
-    tree.overwrite(".devcontainer/devcontainer.json", newData.json);
-    tree.overwrite(".devcontainer/Dockerfile", newData.container);
+    const newData = applyMods(['angular', packageManager], data);
+    tree.overwrite('.devcontainer/devcontainer.json', newData.json);
+    tree.overwrite('.devcontainer/Dockerfile', newData.container);
   };
 }

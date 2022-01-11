@@ -1,4 +1,4 @@
-import { Tree } from "@angular-devkit/schematics";
+import { Tree } from '@angular-devkit/schematics';
 
 export function getPackageManager(tree: Tree): string {
   let packageManager = getPackageManagerFromConfig(tree);
@@ -9,21 +9,17 @@ export function getPackageManager(tree: Tree): string {
   const hasYarnLock = tree.exists('yarn.lock');
   const hasNpmLock = tree.exists('package-lock.json');
 
-  if (hasYarnLock && !hasNpmLock) {
-    packageManager = 'yarn';
-  } else {
-    packageManager = 'npm';
-  }
+  packageManager = hasYarnLock && !hasNpmLock ? 'yarn' : 'npm';
 
   return packageManager;
 }
 
 function getPackageManagerFromConfig(tree: Tree): string | null {
-  const config = tree.read("angular.json");
+  const config = tree.read('angular.json');
   if (!config) {
     return null;
   }
-  const angularJson = JSON.parse(config.toString());
-  return angularJson.cli?.
-  packageManager;
+
+  const angularJson = JSON.parse(config.toString()) as Record<string, any>;
+  return (angularJson.cli?.packageManager as string) ?? null;
 }

@@ -1,6 +1,6 @@
-import { Mod } from "../mod";
+import { Mod } from '../mod.js';
 
-export default {
-  postCreateCommand: "yarn install",
-  globalPackages: ["yarn"]
-} as Mod;
+export const yarn: Mod = {
+  postCreateCommand: 'yarn install',
+  globalPackages: ['yarn']
+};

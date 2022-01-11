@@ -1,5 +1,5 @@
-import { Mod } from "../mod";
+import { Mod } from '../mod.js';
 
-export default {
-  postCreateCommand: "npm install",
-} as Mod;
+export const npm: Mod = {
+  postCreateCommand: 'npm install'
+};
