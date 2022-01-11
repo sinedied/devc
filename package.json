@@ -4,7 +4,8 @@
   "description": "Quickly add .devcontainer configuration to any Angular, React, Vue, Svelte or Node.js project",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "build:watch": "tsc -p tsconfig.json --watch"
+    "build:watch": "tsc -p tsconfig.json --watch",
+    "release:check": "semantic-release --dry-run"
   },
   "repository": {
     "type": "git",
@@ -37,11 +38,21 @@
     "@angular-devkit/core": "^13.1.2",
     "@angular-devkit/schematics": "^13.1.2",
     "chalk": "^4.1.2",
-    "minimist": "^1.2.5",
-    "typescript": "~4.5.2"
+    "minimist": "^1.2.5"
   },
   "devDependencies": {
-    "@types/node": "^12.11.1"
+    "@types/node": "^12.11.1",
+    "semantic-release": "^18.0.0",
+    "semantic-release-npm-github": "^2.0.0",
+    "typescript": "~4.5.2"
+  },
+  "release": {
+    "extends": "semantic-release-npm-github",
+    "branches": "main"
+  },
+  "engines": {
+    "node": "^14.13.1 || >=16.0.0",
+    "npm": ">=6.0.0"
   },
   "files": [
     "bin",
