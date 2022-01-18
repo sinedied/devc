@@ -1,3 +1,3 @@
-export { angular } from './angular.js';
-export { npm } from './npm.js';
-export { yarn } from './yarn.js';
+export * from './angular.js';
+export * from './npm.js';
+export * from './yarn.js';

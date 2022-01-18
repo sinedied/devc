@@ -2,6 +2,10 @@
   "name": "devc",
   "version": "0.0.0",
   "description": "Quickly add .devcontainer configuration to any Angular, React, Vue, Svelte or Node.js project",
+  "bin": {
+    "devc": "./bin/devc.js"
+  },
+  "main": "./lib/index.js",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "build:watch": "tsc -p tsconfig.json --watch",
@@ -42,9 +46,12 @@
     "@angular-devkit/core": "^13.1.2",
     "@angular-devkit/schematics": "^13.1.2",
     "chalk": "^4.1.2",
+    "debug": "^4.3.3",
     "minimist": "^1.2.5"
   },
   "devDependencies": {
+    "@types/debug": "^4.1.7",
+    "@types/minimist": "^1.2.2",
     "@types/node": "^12.11.1",
     "semantic-release": "^18.0.0",
     "semantic-release-npm-github": "^2.0.0",
@@ -70,7 +77,10 @@
       "node"
     ],
     "rules": {
-      "unicorn/prefer-module": "off"
+      "unicorn/prefer-module": "off",
+      "unicorn/prefer-node-protocol": "off",
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-unsafe-call": "off"
     }
   },
   "files": [
