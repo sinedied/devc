@@ -36,8 +36,16 @@ export async function recursiveCopy(
   );
 }
 
-export async function readJson(path: string) {
-  const contents = await fs.readFile(path, 'utf8');
+export function stripJsonComment(json: string) {
+  return json.replace(/(\/\/.*|\/\*[\s\S]*?\*\/)/g, '');
+}
+
+export async function readJson(path: string, stripComments = false) {
+  let contents = await fs.readFile(path, 'utf8');
+  if (stripComments) {
+    contents = stripJsonComment(contents);
+  }
+
   return JSON.parse(contents) as Record<string, any>;
 }
 
@@ -61,4 +69,15 @@ export async function askForInput(question: string): Promise<string> {
       resolve(answer);
     });
   });
+}
+
+export async function getGitRootPath(folderPath: string) {
+  try {
+    const { stdout } = await promisify(exec)(`git rev-parse --show-toplevel`, {
+      cwd: folderPath
+    });
+    return stdout.trim();
+  } catch {
+    return null;
+  }
 }

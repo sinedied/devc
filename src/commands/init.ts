@@ -15,7 +15,7 @@ import { askForInput } from '../util.js';
 
 const debug = createDebug('init');
 
-interface InitOptions {
+export interface InitOptions {
   stack: string[];
   packageManager: string;
   list: boolean;

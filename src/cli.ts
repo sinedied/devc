@@ -2,23 +2,23 @@ import path from 'path';
 import minimist from 'minimist';
 import debug from 'debug';
 import chalk from 'chalk';
-import { init } from './commands/index.js';
+import { init, code } from './commands/index.js';
 import { readJson } from './util.js';
 
 const help = chalk`Usage: devc [command] [options]
 
 Commands:
-  {cyan init}                Initialize dev container config (default command)
+  {cyan init}                Initialize devcontainer config (default command)
     -s, --stack <name1, name2, ...>
                       Set the stack to be used (default: autodetect)
     -p, --packageManager <npm|yarn|pnpm>
                       Set package manager (default: autodetect)
     --list            List available tech stacks
 
-  {cyan code}                Open current folder in a VS Code dev container
-    --codespaces      Open project in GitHub Codespaces (experimental) 
+  {cyan code} [path]         Open folder in a VS Code devcontainer
+    -i, --insiders    Use insiders version of VS Code
 
-  {cyan shell} [command]     Open a shell in dev container
+  {cyan shell} [command]     Open a shell in devcontainer
     -e, --exec <cmd>  Execute command in container shell
 
 General options:
@@ -29,10 +29,12 @@ General options:
 export async function run(args: string[]) {
   const options = minimist(args, {
     string: ['stack', 'packageManager', 'exec'],
-    boolean: ['codespaces', 'list', 'version', 'help', 'verbose'],
+    boolean: ['insiders', 'codespaces', 'list', 'version', 'help', 'verbose'],
     alias: {
       s: 'stack',
       p: 'packageManager',
+      i: 'insiders',
+      c: 'codespaces',
       e: 'exec',
       v: 'version'
     }
@@ -63,7 +65,11 @@ export async function run(args: string[]) {
         list: options.list
       });
     case 'code':
-      return; // TODO
+      return code({
+        path: options._[1],
+        insiders: options.insiders,
+        codespaces: options.codespaces
+      });
     case 'shell':
       return; // TODO
     default:
