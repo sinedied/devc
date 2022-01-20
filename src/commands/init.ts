@@ -27,7 +27,7 @@ export async function init(options?: Partial<InitOptions>) {
 
   if (options.list) {
     const stacks = [...supportedStacks];
-    console.info(`Available tech stacks:\n  - ${stacks.join('\n  - ')}`);
+    console.info(`Available tech stacks:\n- ${stacks.join('\n- ')}`);
     return;
   }
 
@@ -40,9 +40,9 @@ export async function init(options?: Partial<InitOptions>) {
 
     if (await hasDevContainer()) {
       const answer = await askForInput(
-        '.devcontainer already exists in this folder, overwrite? [y/N] '
+        '.devcontainer already exists in this folder, overwrite? [Y/n] '
       );
-      if (answer.toLowerCase() !== 'y') {
+      if (answer !== '' && answer.toLowerCase() !== 'y') {
         return;
       }
     }
