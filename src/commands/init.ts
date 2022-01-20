@@ -4,11 +4,11 @@ import chalk from 'chalk';
 import createDebug from 'debug';
 import { applyMods } from '../mod.js';
 import {
-  availableStacks,
   checkValidPackageManager,
   checkValidStack,
   detectPackageManager,
-  detectStack
+  detectStack,
+  supportedStacks
 } from '../stack.js';
 import { copyDevContainerTemplate, hasDevContainer } from '../container.js';
 import { askForInput } from '../util.js';
@@ -26,7 +26,7 @@ export async function init(options?: Partial<InitOptions>) {
   debug('Options: %o', options);
 
   if (options.list) {
-    const stacks = availableStacks();
+    const stacks = [...supportedStacks];
     console.info(`Available tech stacks:\n  - ${stacks.join('\n  - ')}`);
     return;
   }

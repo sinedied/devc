@@ -1,4 +1,5 @@
 import * as mods from './mods/index.js';
+import { unique } from './util.js';
 
 export interface Mod {
   forwardPorts?: number[];
@@ -6,6 +7,13 @@ export interface Mod {
   postCreateCommand?: string;
   globalPackages?: string[];
   extraContainerSetup?: string;
+  applyIf?: ApplyConditions;
+}
+
+export interface ApplyConditions {
+  packages?: string[];
+  files?: string[];
+  condition?: () => Promise<boolean> | boolean;
 }
 
 export interface DevcontainerData {
@@ -21,8 +29,8 @@ export function applyMods(
   let forwardPorts: number[] = [];
   let extensions: string[] = [];
   let globalPackages: string[] = [];
-  const postCreateCommand: string[] = [];
-  const extraContainerSetup: string[] = [];
+  let postCreateCommand: string[] = [];
+  let extraContainerSetup: string[] = [];
 
   for (const mod of modsToApply) {
     forwardPorts = [...forwardPorts, ...(mod.forwardPorts ?? [])];

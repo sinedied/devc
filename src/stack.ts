@@ -1,19 +1,13 @@
 import * as mods from './mods/index.js';
 import { pathExists, readJson } from './util.js';
 
-// TODO: move detection to mods?
-const stackPackages = [
-  { name: 'angular', packages: ['@angular/core'] },
-  { name: 'react', packages: ['react'] },
-  { name: 'vue', packages: ['vue'] },
-  { name: 'svelte', packages: ['svelte'] }
-];
-const supportedPackageManagers = new Set(['npm', 'yarn', 'pnpm']);
-const supportedStacks = new Set(availableStacks());
+export const supportedPackageManagers = new Set(['npm', 'yarn', 'pnpm']);
+export const stacks = availableStacks();
+export const supportedStacks = new Set(stacks.map(([name]) => name));
 
-export function availableStacks(): string[] {
-  return Object.keys(mods).filter(
-    (name) => !supportedPackageManagers.has(name)
+function availableStacks() {
+  return Object.entries(mods).filter(
+    ([name, _mod]) => !supportedPackageManagers.has(name)
   );
 }
 
@@ -63,7 +57,7 @@ export async function detectStack() {
     throw new Error(`Could not read package.json: ${(error as Error).message}`);
   }
 
-  let matchedStacks = matchStacks(packageInfo);
+  let matchedStacks = await matchStacks(packageInfo);
   if (matchedStacks.length === 0) {
     console.info(
       `Could not determine used stack (no known stack found).\nFalling back to standard Node.js setup, use --stack=<stack> to force specific stack.`
@@ -74,10 +68,22 @@ export async function detectStack() {
   return matchedStacks;
 }
 
-function matchStacks(packageJson: any): string[] {
-  return stackPackages
-    .filter((stack) => hasPackage(packageJson, stack.packages))
-    .map((stack) => stack.name);
+async function matchStacks(packageJson: any) {
+  const matchedStacks: string[] = [];
+  await Promise.all(
+    stacks.map(async ([name, mod]) => {
+      if (
+        mod.applyIf &&
+        ((mod.applyIf.packages &&
+          hasPackage(packageJson, mod.applyIf.packages)) ||
+          (mod.applyIf.files && (await hasOneOfFiles(mod.applyIf.files))) ||
+          (mod.applyIf.condition && (await mod.applyIf.condition())))
+      ) {
+        matchedStacks.push(name);
+      }
+    })
+  );
+  return matchedStacks;
 }
 
 function hasPackage(packageJson: any, packageList: string[]) {
@@ -86,4 +92,8 @@ function hasPackage(packageJson: any, packageList: string[]) {
       packageJson.dependencies[packageName] ||
       packageJson.devDependencies[packageName]
   );
+}
+
+async function hasOneOfFiles(files: string[]) {
+  return files.some(async (file) => pathExists(file));
 }
