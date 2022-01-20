@@ -12,8 +12,6 @@ import {
 } from '@angular-devkit/schematics';
 import { applyMods } from '../mod.js';
 
-// You don't have to export the function as default. You can also have more than one rule factory
-// per file.
 export default function generate(options: any): Rule {
   return (tree: Tree, context: SchematicContext) => {
     const templateSource = apply(url('../../template'), [

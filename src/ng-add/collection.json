@@ -1,9 +1,9 @@
 {
-  "$schema": "../node_modules/@angular-devkit/schematics/collection-schema.json",
+  "$schema": "../../node_modules/@angular-devkit/schematics/collection-schema.json",
   "schematics": {
     "ng-add": {
       "description": "Adds .devcontainer configuration to your project",
-      "factory": "./ng-add/index",
+      "factory": "./index",
       "aliases": ["devc"],
       "save": false
     }

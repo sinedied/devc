@@ -1,7 +1,7 @@
 {
   "name": "devc",
-  "version": "0.0.0",
-  "description": "Quickly add .devcontainer configuration to any Angular, React, Vue, Svelte or Node.js project",
+  "version": "0.1.0",
+  "description": "Quickly add .devcontainer configuration to any JavaScript project, and more!",
   "bin": {
     "devc": "./bin/devc.js"
   },
@@ -41,7 +41,7 @@
     "url": "https://twitter.com/sinedied"
   },
   "license": "MIT",
-  "schematics": "./lib/collection.json",
+  "schematics": "./lib/ng-add/collection.json",
   "dependencies": {
     "@angular-devkit/core": "^13.1.2",
     "@angular-devkit/schematics": "^13.1.2",
