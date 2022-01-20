@@ -81,3 +81,7 @@ export async function getGitRootPath(folderPath: string) {
     return null;
   }
 }
+
+export function unique<T>(array: T[]) {
+  return [...new Set(array)];
+}

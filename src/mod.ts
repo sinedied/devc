@@ -38,6 +38,13 @@ export function applyMods(
     }
   }
 
+  // Filter unique values for all params
+  forwardPorts = unique(forwardPorts);
+  extensions = unique(extensions);
+  globalPackages = unique(globalPackages);
+  postCreateCommand = unique(postCreateCommand);
+  extraContainerSetup = unique(extraContainerSetup);
+
   const newData = { ...data };
   if (forwardPorts.length > 0) {
     newData.json = newData.json.replace(
