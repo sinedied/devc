@@ -1,6 +1,10 @@
+import chalk from 'chalk';
+import createDebug from 'debug';
+import glob from 'fast-glob';
 import * as mods from './mods/index.js';
 import { pathExists, readJson } from './util.js';
 
+const debug = createDebug('stack');
 export const supportedPackageManagers = new Set(['npm', 'yarn', 'pnpm']);
 export const stacks = availableStacks();
 export const supportedStacks = new Set(stacks.map(([name]) => name));
@@ -44,25 +48,32 @@ export async function detectPackageManager(): Promise<string> {
 }
 
 export async function detectStack() {
-  if (!(await pathExists('package.json'))) {
-    throw new Error(
-      `Could not find package.json. Please use --stack=<stack> to specify the stack.`
-    );
-  }
-
   let packageInfo: Record<string, any> | null = null;
-  try {
-    packageInfo = await readJson('package.json');
-  } catch (error: unknown) {
-    throw new Error(`Could not read package.json: ${(error as Error).message}`);
+
+  if (await pathExists('package.json')) {
+    try {
+      packageInfo = await readJson('package.json');
+    } catch (error: unknown) {
+      throw new Error(
+        `Could not read package.json: ${(error as Error).message}`
+      );
+    }
+  } else {
+    console.info(
+      chalk.yellow(
+        `Could not find package.json, stack detection may be incorrect.\nPlease use --stack=<stack> to specify the stack.`
+      )
+    );
   }
 
   let matchedStacks = await matchStacks(packageInfo);
   if (matchedStacks.length === 0) {
     console.info(
-      `Could not determine used stack (no known stack found).\nFalling back to standard Node.js setup, use --stack=<stack> to force specific stack.`
+      chalk.yellow(
+        `Could not determine used stack (no known stack found).\nFalling back to standard Node.js setup, use --stack=<stack> to force specific stack.`
+      )
     );
-    matchedStacks = ['node'];
+    matchedStacks = [];
   }
 
   return matchedStacks;
@@ -72,13 +83,17 @@ async function matchStacks(packageJson: any) {
   const matchedStacks: string[] = [];
   await Promise.all(
     stacks.map(async ([name, mod]) => {
-      if (
-        mod.applyIf &&
-        ((mod.applyIf.packages &&
-          hasPackage(packageJson, mod.applyIf.packages)) ||
-          (mod.applyIf.files && (await hasOneOfFiles(mod.applyIf.files))) ||
-          (mod.applyIf.condition && (await mod.applyIf.condition())))
-      ) {
+      debug('Checking if should apply: %s', name);
+      const matchAnyPackage =
+        mod.applyIf?.packages &&
+        packageJson &&
+        hasPackage(packageJson, mod.applyIf.packages);
+      const matchAnyFile =
+        mod.applyIf?.files && (await hasOneOfFiles(mod.applyIf.files));
+      const matchCondition =
+        mod.applyIf?.condition && (await mod.applyIf.condition());
+
+      if (matchAnyPackage || matchAnyFile || matchCondition) {
         matchedStacks.push(name);
       }
     })
@@ -95,5 +110,11 @@ function hasPackage(packageJson: any, packageList: string[]) {
 }
 
 async function hasOneOfFiles(files: string[]) {
-  return files.some(async (file) => pathExists(file));
+  debug('Searching for files: %O', files);
+  const matches = await glob(files, {
+    dot: true,
+    ignore: ['**/node_modules/**']
+  });
+  debug('Found files: %O', matches);
+  return matches.length > 0;
 }

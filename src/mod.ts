@@ -57,7 +57,7 @@ export function applyMods(
   if (forwardPorts.length > 0) {
     newData.json = newData.json.replace(
       `"forwardPorts": [],`,
-      `"forwardPorts": [${forwardPorts.join(',')}],`
+      `"forwardPorts": [${forwardPorts.join(', ')}],`
     );
   }
 

@@ -47,6 +47,7 @@
     "@angular-devkit/schematics": "^13.1.2",
     "chalk": "^4.1.2",
     "debug": "^4.3.3",
+    "fast-glob": "^3.2.11",
     "minimist": "^1.2.5"
   },
   "devDependencies": {

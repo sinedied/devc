@@ -5,3 +5,5 @@ export * from './angular.js';
 export * from './react.js';
 export * from './vue.js';
 export * from './svelte.js';
+export * from './azure/functions.js';
+export * from './azure/static-web-apps.js';
