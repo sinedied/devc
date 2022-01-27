@@ -60,7 +60,7 @@ export async function run(args: string[]) {
     case undefined:
     case 'init':
       return init({
-        stack: options.stack,
+        stack: options.stack?.split(',').map((s: string) => s.trim()),
         packageManager: options.packageManager,
         list: options.list
       });

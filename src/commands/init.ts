@@ -55,6 +55,8 @@ export async function init(options?: Partial<InitOptions>) {
     if (stack.length === 0) {
       stack = await detectStack();
       console.info(`Detected stack: ${chalk.cyan(stack.join(', '))}`);
+    } else {
+      console.info(`Using stack: ${chalk.cyan(stack.join(', '))}`);
     }
 
     await copyTemplate();
