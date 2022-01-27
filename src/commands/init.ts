@@ -26,7 +26,7 @@ export async function init(options?: Partial<InitOptions>) {
   debug('Options: %o', options);
 
   if (options.list) {
-    const stacks = [...supportedStacks];
+    const stacks = [...supportedStacks].sort();
     console.info(`Available tech stacks:\n- ${stacks.join('\n- ')}`);
     return;
   }
