@@ -9,7 +9,7 @@ export interface Mod {
   extensions?: string[];
   postCreateCommand?: string;
   globalPackages?: string[];
-  extraContainerSetup?: string;
+  containerSetup?: string;
   includeMods?: string[];
   applyIf?: ApplyConditions;
 }
@@ -37,7 +37,7 @@ export function applyMods(
   let extensions: string[] = [];
   let globalPackages: string[] = [];
   let postCreateCommand: string[] = [];
-  let extraContainerSetup: string[] = [];
+  let containerSetup: string[] = [];
 
   for (const mod of modsToApply) {
     forwardPorts = [...forwardPorts, ...(mod.forwardPorts ?? [])];
@@ -48,8 +48,8 @@ export function applyMods(
       postCreateCommand.push(mod.postCreateCommand);
     }
 
-    if (mod.extraContainerSetup) {
-      extraContainerSetup.push(mod.extraContainerSetup);
+    if (mod.containerSetup) {
+      containerSetup.push(mod.containerSetup);
     }
   }
 
@@ -58,7 +58,7 @@ export function applyMods(
   extensions = unique(extensions);
   globalPackages = unique(globalPackages);
   postCreateCommand = unique(postCreateCommand);
-  extraContainerSetup = unique(extraContainerSetup);
+  containerSetup = unique(containerSetup);
 
   const newData = { ...data };
   if (forwardPorts.length > 0) {
@@ -89,8 +89,8 @@ export function applyMods(
     );
   }
 
-  if (extraContainerSetup.length > 0) {
-    newData.container += `\n${extraContainerSetup.join('\n\n')}\n`;
+  if (containerSetup.length > 0) {
+    newData.container += `\n${containerSetup.join('\n\n')}\n`;
   }
 
   return newData;
