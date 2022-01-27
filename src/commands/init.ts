@@ -74,7 +74,7 @@ async function copyTemplate() {
 }
 
 async function applyTemplateMods(modNames: string[]) {
-  debug('Applying mods: %s', modNames.join(', '));
+  debug('Applying mods: %o', modNames);
 
   const json = await fs.readFile('.devcontainer/devcontainer.json', 'utf8');
   if (!json) {

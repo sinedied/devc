@@ -1,5 +1,8 @@
+import createDebug from 'debug';
 import * as mods from './mods/index.js';
 import { unique } from './util.js';
+
+const debug = createDebug('mod');
 
 export interface Mod {
   forwardPorts?: number[];
@@ -7,6 +10,7 @@ export interface Mod {
   postCreateCommand?: string;
   globalPackages?: string[];
   extraContainerSetup?: string;
+  includeMods?: string[];
   applyIf?: ApplyConditions;
 }
 
@@ -25,7 +29,10 @@ export function applyMods(
   modNames: string[],
   data: DevcontainerData
 ): DevcontainerData {
-  const modsToApply: Mod[] = modNames.map((name) => getMod(name));
+  const modsToApply: Mod[] = modNames
+    .map((name) => getMod(name))
+    .flatMap((mod) => getModIncludes(mod));
+
   let forwardPorts: number[] = [];
   let extensions: string[] = [];
   let globalPackages: string[] = [];
@@ -97,4 +104,18 @@ function getMod(name: string): Mod {
   }
 
   return mod;
+}
+
+function getModIncludes(mod: Mod): Mod | Mod[] {
+  if (!mod.includeMods || mod.includeMods.length === 0) {
+    return mod;
+  }
+
+  debug('Additional included mods: %o', mod.includeMods);
+  return [
+    mod,
+    ...mod.includeMods
+      .map((name) => getMod(name))
+      .flatMap((m) => getModIncludes(m))
+  ];
 }
