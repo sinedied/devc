@@ -1,13 +1,19 @@
+import path from 'path';
 import chalk from 'chalk';
 import createDebug from 'debug';
 import glob from 'fast-glob';
 import * as mods from './mods/index.js';
-import { pathExists, readJson } from './util.js';
+import { pathExists, readJson, unique } from './util.js';
 
 const debug = createDebug('stack');
 export const supportedPackageManagers = new Set(['npm', 'yarn', 'pnpm']);
 export const stacks = availableStacks();
 export const supportedStacks = new Set(stacks.map(([name]) => name));
+
+interface PackageInfo {
+  file: string;
+  packageJson: Record<string, any>;
+}
 
 function availableStacks() {
   return Object.entries(mods).filter(
@@ -36,6 +42,8 @@ export async function detectPackageManager(): Promise<string> {
   const hasNpmLock = await pathExists('package-lock.json');
   const hasPnpmLock = await pathExists('pnpm-lock.yaml');
 
+  // TODO: search in subfolders?
+
   if (hasPnpmLock && !hasNpmLock && !hasYarnLock) {
     return 'pnpm';
   }
@@ -48,11 +56,21 @@ export async function detectPackageManager(): Promise<string> {
 }
 
 export async function detectStack() {
-  let packageInfo: Record<string, any> | null = null;
+  let packageInfos: PackageInfo[] = [];
 
-  if (await pathExists('package.json')) {
+  const packageJsonFiles = await glob('**/package.json', {
+    dot: true,
+    ignore: ['**/node_modules/**']
+  });
+
+  if (packageJsonFiles.length > 0) {
     try {
-      packageInfo = await readJson('package.json');
+      packageInfos = await Promise.all(
+        packageJsonFiles.map(async (file) => ({
+          file,
+          packageJson: await readJson(file)
+        }))
+      );
     } catch (error: unknown) {
       throw new Error(
         `Could not read package.json: ${(error as Error).message}`
@@ -61,12 +79,15 @@ export async function detectStack() {
   } else {
     console.info(
       chalk.yellow(
-        `Could not find package.json, stack detection may be incorrect.\nPlease use --stack=<stack> to specify the stack.`
+        `Could not find any package.json, stack detection may be incorrect.\nPlease use --stack=<stack> to specify the stack.`
       )
     );
   }
 
-  let matchedStacks = await matchStacks(packageInfo);
+  const matchedStacksList = await Promise.all(
+    packageInfos.map(async (packageInfo) => matchStacks(packageInfo))
+  );
+  let matchedStacks = matchedStacksList.flat();
   if (matchedStacks.length === 0) {
     console.info(
       chalk.yellow(
@@ -76,10 +97,12 @@ export async function detectStack() {
     matchedStacks = [];
   }
 
-  return matchedStacks;
+  return unique(matchedStacks);
 }
 
-async function matchStacks(packageJson: any) {
+async function matchStacks(packageInfo: PackageInfo) {
+  const { file, packageJson } = packageInfo;
+  const root = path.dirname(file);
   const matchedStacks: string[] = [];
   await Promise.all(
     stacks.map(async ([name, mod]) => {
@@ -89,7 +112,7 @@ async function matchStacks(packageJson: any) {
         packageJson &&
         hasPackage(packageJson, mod.applyIf.packages);
       const matchAnyFile =
-        mod.applyIf?.files && (await hasOneOfFiles(mod.applyIf.files));
+        mod.applyIf?.files && (await hasOneOfFiles(root, mod.applyIf.files));
       const matchCondition =
         mod.applyIf?.condition && (await mod.applyIf.condition());
 
@@ -109,11 +132,12 @@ function hasPackage(packageJson: any, packageList: string[]) {
   );
 }
 
-async function hasOneOfFiles(files: string[]) {
+async function hasOneOfFiles(root: string, files: string[]) {
   debug('Searching for files: %O', files);
   const matches = await glob(files, {
     dot: true,
-    ignore: ['**/node_modules/**']
+    ignore: ['**/node_modules/**'],
+    cwd: root || undefined
   });
   debug('Found files: %O', matches);
   return matches.length > 0;
