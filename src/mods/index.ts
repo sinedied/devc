@@ -1,3 +1,4 @@
+export * from './azure/cli.js';
 export * from './azure/functions.js';
 export * from './azure/static-web-apps.js';
 export * from './angular.js';
