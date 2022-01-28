@@ -1,4 +1,5 @@
 import process from 'process';
+import path from 'path';
 import { promises as fs } from 'fs';
 import chalk from 'chalk';
 import createDebug from 'debug';
@@ -10,10 +11,15 @@ import {
   detectStack,
   supportedStacks
 } from '../stack.js';
-import { copyDevContainerTemplate, hasDevContainer } from '../container.js';
-import { askForInput } from '../util.js';
+import {
+  copyDevContainerTemplate,
+  hasDevContainer,
+  devcontainerFolder
+} from '../container.js';
+import { askForInput, recursiveCopy } from '../util.js';
 
 const debug = createDebug('init');
+const baseTemplatePath = path.join(__dirname, '../../template/');
 
 export interface InitOptions {
   stack: string[];
@@ -59,8 +65,10 @@ export async function init(options?: Partial<InitOptions>) {
       console.info(`Using stack: ${chalk.cyan(stack.join(', '))}`);
     }
 
-    await copyTemplate();
-    await applyTemplateMods([packageManager, ...stack]);
+    await copyDevContainerTemplate();
+    debug('Copied .devcontainer base template.');
+
+    await applyAllMods([packageManager, ...stack]);
     console.info(chalk.green(`Created .devcontainer configuration.`));
   } catch (error: unknown) {
     process.exitCode = -1;
@@ -68,12 +76,7 @@ export async function init(options?: Partial<InitOptions>) {
   }
 }
 
-async function copyTemplate() {
-  await copyDevContainerTemplate();
-  debug('Copied .devcontainer base template.');
-}
-
-async function applyTemplateMods(modNames: string[]) {
+async function applyAllMods(modNames: string[]) {
   debug('Applying mods: %o', modNames);
 
   const json = await fs.readFile('.devcontainer/devcontainer.json', 'utf8');
@@ -91,8 +94,32 @@ async function applyTemplateMods(modNames: string[]) {
     container: container.toString()
   };
 
-  const newData = applyMods(modNames, data);
+  const { data: newData, templates } = await applyMods(modNames, data);
   await fs.writeFile('.devcontainer/devcontainer.json', newData.json);
   await fs.writeFile('.devcontainer/Dockerfile', newData.container);
+
+  if (templates.length > 0) {
+    await Promise.all(
+      templates.map(async (template) => copyTemplate(template))
+    );
+  }
+
   debug('Mods applied.');
+}
+
+async function copyTemplate(template: string) {
+  const templatePath = path.join(baseTemplatePath, template);
+  const targetPath = path.join(
+    devcontainerFolder,
+    path.dirname(template).split(path.sep).slice(1).join(path.sep)
+  );
+  debug('Copying template %s to %s', templatePath, targetPath);
+
+  try {
+    await recursiveCopy(templatePath, targetPath);
+  } catch (error: unknown) {
+    throw new Error(
+      `Failed to copy template ${template}: ${(error as Error).message}`
+    );
+  }
 }

@@ -9,6 +9,8 @@ export interface Mod {
   extensions?: string[];
   postCreateCommand?: string;
   globalPackages?: string[];
+  // Templates must be folder paths
+  templates?: string[];
   containerSetup?: string;
   includeMods?: string[];
   applyIf?: ApplyConditions;
@@ -25,10 +27,15 @@ export interface DevcontainerData {
   container: string;
 }
 
-export function applyMods(
+export interface ModdedDevContainer {
+  data: DevcontainerData;
+  templates: string[];
+}
+
+export async function applyMods(
   modNames: string[],
   data: DevcontainerData
-): DevcontainerData {
+): Promise<ModdedDevContainer> {
   const modsToApply: Mod[] = modNames
     .map((name) => getMod(name))
     .flatMap((mod) => getModIncludes(mod));
@@ -37,12 +44,14 @@ export function applyMods(
   let extensions: string[] = [];
   let globalPackages: string[] = [];
   let postCreateCommand: string[] = [];
+  let templates: string[] = [];
   let containerSetup: string[] = [];
 
   for (const mod of modsToApply) {
     forwardPorts = [...forwardPorts, ...(mod.forwardPorts ?? [])];
     extensions = [...extensions, ...(mod.extensions ?? [])];
     globalPackages = [...globalPackages, ...(mod.globalPackages ?? [])];
+    templates = [...templates, ...(mod.templates ?? [])];
 
     if (mod.postCreateCommand) {
       postCreateCommand.push(mod.postCreateCommand);
@@ -57,6 +66,7 @@ export function applyMods(
   forwardPorts = unique(forwardPorts);
   extensions = unique(extensions);
   globalPackages = unique(globalPackages);
+  templates = unique(templates);
   postCreateCommand = unique(postCreateCommand);
   containerSetup = unique(containerSetup);
 
@@ -93,7 +103,10 @@ export function applyMods(
     newData.container += `\n${containerSetup.join('\n\n')}\n`;
   }
 
-  return newData;
+  return {
+    data: newData,
+    templates
+  };
 }
 
 function getMod(name: string): Mod {

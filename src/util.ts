@@ -19,21 +19,26 @@ export async function recursiveCopy(
   dest: string
 ): Promise<void> {
   try {
-    await fs.mkdir(dest);
+    await fs.mkdir(dest, { recursive: true });
   } catch {
     // ignore if it exists
   }
 
-  const entries = await fs.readdir(source, { withFileTypes: true });
-  await Promise.all(
-    entries.map(async (entry) => {
-      const sourcePath = path.join(source, entry.name);
-      const destPath = path.join(dest, entry.name);
-      return entry.isDirectory()
-        ? recursiveCopy(sourcePath, destPath)
-        : fs.copyFile(sourcePath, destPath);
-    })
-  );
+  const sourceStat = await fs.lstat(source);
+  if (sourceStat.isDirectory()) {
+    const entries = await fs.readdir(source, { withFileTypes: true });
+    await Promise.all(
+      entries.map(async (entry) => {
+        const sourcePath = path.join(source, entry.name);
+        const destPath = path.join(dest, entry.name);
+        return entry.isDirectory()
+          ? recursiveCopy(sourcePath, destPath)
+          : fs.copyFile(sourcePath, destPath);
+      })
+    );
+  } else {
+    await fs.copyFile(source, path.join(dest, path.basename(source)));
+  }
 }
 
 export function stripJsonComment(json: string) {

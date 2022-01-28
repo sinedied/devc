@@ -13,9 +13,9 @@ import {
 
 const debug = createDebug('container');
 const devcontainerTemplate = path.join(__dirname, '../template/.devcontainer');
-const devcontainerFolder = '.devcontainer';
 const devcontainerConfigFile = `.devcontainer/devcontainer.json`;
 const remoteUri = `vscode-remote://dev-container+`;
+export const devcontainerFolder = '.devcontainer';
 
 export async function hasDevContainer() {
   return pathExists(devcontainerFolder);

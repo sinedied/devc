@@ -4,19 +4,24 @@ import {
   chain,
   MergeStrategy,
   mergeWith,
+  move,
   Rule,
   SchematicContext,
   template,
   Tree,
   url
 } from '@angular-devkit/schematics';
+import { devcontainerFolder } from '../container.js';
 import { applyMods } from '../mod.js';
+
+const baseTemplatePath = '../../template';
 
 export default function generate(options: any): Rule {
   return (tree: Tree, context: SchematicContext) => {
-    const templateSource = apply(url('../../template'), [
-      template({ ...options, ...strings })
-    ]);
+    const templateSource = apply(
+      url(`${baseTemplatePath}/${devcontainerFolder}`),
+      [template({ ...options, ...strings }), move(devcontainerFolder)]
+    );
     const generateTemplateRule = mergeWith(
       templateSource,
       MergeStrategy.Overwrite
@@ -26,8 +31,8 @@ export default function generate(options: any): Rule {
   };
 }
 
-function applyModsRule(_options: any): Rule {
-  return (tree: Tree, _context: SchematicContext) => {
+function applyModsRule(options: any): Rule {
+  return async (tree: Tree, _context: SchematicContext) => {
     const json = tree.read('.devcontainer/devcontainer.json');
     if (!json) {
       throw new Error('Missing devcontainer.json');
@@ -42,10 +47,34 @@ function applyModsRule(_options: any): Rule {
       json: json.toString(),
       container: container.toString()
     };
+
+    // TODO: support stack and package manager options
+    // TODO: run stack detection if no stack is specified
+
     const packageManager = getPackageManager(tree);
-    const newData = applyMods(['angular', packageManager], data);
+    const { data: newData, templates } = await applyMods(
+      ['angular', packageManager, 'azureCli'],
+      data
+    );
     tree.overwrite('.devcontainer/devcontainer.json', newData.json);
     tree.overwrite('.devcontainer/Dockerfile', newData.container);
+
+    return copyExtraTemplates(options, templates);
+  };
+}
+
+function copyExtraTemplates(options: any, templates: string[]): Rule {
+  return (_tree: Tree, _context: SchematicContext) => {
+    const templatesRules = templates.map((templatePath) => {
+      const templateSource = apply(url(`${baseTemplatePath}/${templatePath}`), [
+        template({ ...options, ...strings }),
+        move(`${devcontainerFolder}`)
+      ]);
+
+      return mergeWith(templateSource, MergeStrategy.Overwrite);
+    });
+
+    return chain(templatesRules);
   };
 }
 
