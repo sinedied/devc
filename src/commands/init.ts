@@ -24,6 +24,7 @@ const baseTemplatePath = path.join(__dirname, '../../template/');
 export interface InitOptions {
   stack: string[];
   packageManager: string;
+  detect: boolean;
   list: boolean;
 }
 
@@ -58,8 +59,8 @@ export async function init(options?: Partial<InitOptions>) {
       console.info(`Detected package manager: ${chalk.cyan(packageManager)}`);
     }
 
-    if (stack.length === 0) {
-      stack = await detectStack();
+    if (stack.length === 0 || options.detect) {
+      stack = [...stack, ...(await detectStack())];
       console.info(`Detected stack: ${chalk.cyan(stack.join(', '))}`);
     } else {
       console.info(`Using stack: ${chalk.cyan(stack.join(', '))}`);

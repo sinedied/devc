@@ -13,6 +13,7 @@ Commands:
                       Set the stack to be used (default: autodetect)
     -p, --packageManager <npm|yarn|pnpm>
                       Set package manager (default: autodetect)
+    -d, --detect      Force stack detection even if stack option is set
     --list            List available tech stacks
 
   {cyan code} [path]         Open folder in a VS Code devcontainer
@@ -29,10 +30,19 @@ General options:
 export async function run(args: string[]) {
   const options = minimist(args, {
     string: ['stack', 'packageManager', 'exec'],
-    boolean: ['insiders', 'codespaces', 'list', 'version', 'help', 'verbose'],
+    boolean: [
+      'detect',
+      'insiders',
+      'codespaces',
+      'list',
+      'version',
+      'help',
+      'verbose'
+    ],
     alias: {
       s: 'stack',
       p: 'packageManager',
+      d: 'detect',
       i: 'insiders',
       c: 'codespaces',
       e: 'exec',
@@ -62,6 +72,7 @@ export async function run(args: string[]) {
       return init({
         stack: options.stack?.split(',').map((s: string) => s.trim()),
         packageManager: options.packageManager,
+        detect: options.detect,
         list: options.list
       });
     case 'code':
