@@ -27,7 +27,7 @@ export function checkValidStack(stack: string[]) {
   }
 }
 
-export function checkValidPackageManager(packageManager: string | null) {
+export function checkValidPackageManager(packageManager?: string) {
   if (packageManager && !supportedPackageManagers.has(packageManager)) {
     throw new Error(
       `Package manager "${packageManager}" is not supported.\nSupported package managers: ${[

@@ -91,12 +91,12 @@ export function getPackageManager(tree: Tree): string {
   return packageManager;
 }
 
-function getPackageManagerFromConfig(tree: Tree): string | null {
+function getPackageManagerFromConfig(tree: Tree): string | undefined {
   const config = tree.read('angular.json');
   if (!config) {
-    return null;
+    return undefined;
   }
 
   const angularJson = JSON.parse(config.toString()) as Record<string, any>;
-  return (angularJson.cli?.packageManager as string) ?? null;
+  return (angularJson.cli?.packageManager as string) ?? undefined;
 }

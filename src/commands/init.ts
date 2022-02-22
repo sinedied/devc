@@ -40,7 +40,7 @@ export async function init(options?: Partial<InitOptions>) {
 
   try {
     let stack = options.stack ?? [];
-    let packageManager = options.packageManager ?? null;
+    let { packageManager } = options;
 
     checkValidPackageManager(packageManager);
     checkValidStack(stack);
