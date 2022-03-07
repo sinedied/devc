@@ -9,11 +9,14 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "build:watch": "tsc -p tsconfig.json --watch",
+    "build:clean": "npm run clean -s && npm run build -s",
     "lint": "xo",
     "lint:fix": "xo --fix",
     "test": "xo",
     "clean": "npx rimraf lib",
-    "release:check": "semantic-release --dry-run"
+    "release:check": "semantic-release --dry-run",
+    "prepare": "npm run build:clean -s",
+    "postpublish": "git tag -a $npm_package_version -m \"$npm_package_version\" && git push --tags"
   },
   "repository": {
     "type": "git",
