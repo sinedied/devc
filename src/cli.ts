@@ -2,7 +2,7 @@ import path from 'path';
 import minimist from 'minimist';
 import debug from 'debug';
 import chalk from 'chalk';
-import { init, code } from './commands/index.js';
+import { init, code, shell } from './commands/index.js';
 import { readJson } from './util.js';
 
 const help = chalk`Usage: devc [command] [options]
@@ -82,7 +82,9 @@ export async function run(args: string[]) {
         codespaces: options.codespaces
       });
     case 'shell':
-      return; // TODO
+      return shell({
+        exec: options.exec
+      });
     default:
       console.info(help);
   }

@@ -4,12 +4,18 @@ import { promisify } from 'util';
 import { Buffer } from 'buffer';
 import createDebug from 'debug';
 import {
+  findUp,
   getGitRootPath,
   pathExists,
   readJson,
   recursiveCopy,
   supportsBinary
 } from './util.js';
+
+export interface DevContainerRunDetails {
+  workspacePath: string;
+  user?: string;
+}
 
 const debug = createDebug('container');
 const devcontainerTemplate = path.join(__dirname, '../template/.devcontainer');
@@ -39,19 +45,42 @@ export async function openCodeWithDevContainer(
 
   const workspace = await getDevContainerWorkspace(projectPath);
   const uri = await createDevContainerLaunchUri(projectPath, workspace);
-  await promisify(exec)(`${codeBin} --folder-uri=${uri}`);
+  await promisify(exec)(`${codeBin} --folder-uri="${uri}"`);
 }
 
-export async function getDevContainerWorkspace(projectPath: string) {
-  // TODO: check projectPath compatibility with WSL
-  let workspacePath: string;
+export async function getDevContainerRootFolder(basePath: string) {
+  basePath = path.resolve(basePath);
+  const devContainerPath = await findUp(basePath, devcontainerFolder);
+  return devContainerPath ? path.dirname(devContainerPath) : undefined;
+}
 
+export async function getDevContainerRunDetails(
+  projectPath: string
+): Promise<DevContainerRunDetails> {
+  // TODO: check projectPath compatibility with WSL
   try {
+    const devContainerPath = await getDevContainerRootFolder(projectPath);
+    if (!devContainerPath) {
+      throw new Error('.devcontainer folder not found');
+    }
+
     // Look in devcontainer.json for a custom workspace path
-    const configPath = path.join(projectPath, devcontainerConfigFile);
+    const configPath = path.join(devContainerPath, devcontainerConfigFile);
     const config = await readJson(configPath, true);
-    workspacePath = config.workspacePath;
+    let { workspacePath } = config;
     debug('Workspace in devcontainer config: %s', workspacePath);
+    const user = config.remoteUser;
+    debug('User in devcontainer config: %s', user);
+
+    if (!workspacePath) {
+      workspacePath = await getDefaultDevContainerWorkspace(devContainerPath);
+      debug('Using default workspace: %s', workspacePath);
+    }
+
+    return {
+      workspacePath,
+      user
+    };
   } catch (error: unknown) {
     throw new Error(
       `Could not read ${path.basename(devcontainerConfigFile)}: ${
@@ -59,12 +88,10 @@ export async function getDevContainerWorkspace(projectPath: string) {
       }`
     );
   }
+}
 
-  if (!workspacePath) {
-    workspacePath = await getDefaultDevContainerWorkspace(projectPath);
-    debug('Using default workspace: %s', workspacePath);
-  }
-
+export async function getDevContainerWorkspace(projectPath: string) {
+  const { workspacePath } = await getDevContainerRunDetails(projectPath);
   return workspacePath;
 }
 
@@ -75,7 +102,7 @@ export async function getDefaultDevContainerWorkspace(projectPath: string) {
   }
 
   const rootParent = path.join(rootPath, '..');
-  return `/workspaces/${path.relative(rootParent, rootPath)}`;
+  return `/workspaces/${path.relative(rootParent, projectPath)}`;
 }
 
 async function createDevContainerLaunchUri(
