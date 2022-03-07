@@ -1,0 +1,36 @@
+name: build
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, macos-latest, windows-latest]
+        node-version: ['14', '>=16']
+
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+    # Avoid issues with Prettier on Windows
+    - name: Disable git automatic line ending conversion
+      run: git config --global core.autocrlf false
+
+    - uses: actions/checkout@v1
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: npm install and test
+      run: |
+        npm ci
+        npm test
+      env:
+        CI: true
