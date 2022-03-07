@@ -3,9 +3,8 @@
   "schematics": {
     "ng-add": {
       "description": "Adds .devcontainer configuration to your project",
-      "factory": "./index",
-      "aliases": ["devc"],
-      "save": false
+      "schema": "./schema.json",
+      "factory": "./index"
     }
   }
 }

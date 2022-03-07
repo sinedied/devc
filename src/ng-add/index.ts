@@ -13,10 +13,17 @@ import {
 } from '@angular-devkit/schematics';
 import { devcontainerFolder } from '../container.js';
 import { applyMods } from '../mod.js';
+import { detectPackageManager, detectStack } from '../stack.js';
+
+interface SchemaOptions {
+  packageManager?: string;
+  stack?: string;
+  detect?: boolean;
+}
 
 const baseTemplatePath = '../../template';
 
-export default function generate(options: any): Rule {
+export default function generate(options: SchemaOptions): Rule {
   return (tree: Tree, context: SchematicContext) => {
     const templateSource = apply(
       url(`${baseTemplatePath}/${devcontainerFolder}`),
@@ -31,7 +38,7 @@ export default function generate(options: any): Rule {
   };
 }
 
-function applyModsRule(options: any): Rule {
+function applyModsRule(options: SchemaOptions): Rule {
   return async (tree: Tree, _context: SchematicContext) => {
     const json = tree.read('.devcontainer/devcontainer.json');
     if (!json) {
@@ -48,12 +55,15 @@ function applyModsRule(options: any): Rule {
       container: container.toString()
     };
 
-    // TODO: support stack and package manager options
-    // TODO: run stack detection if no stack is specified
+    const packageManager = await getPackageManager(options, tree);
+    let stack = options.stack?.split(',').map((s: string) => s.trim()) ?? [];
 
-    const packageManager = getPackageManager(tree);
+    if (stack.length === 0 || options.detect) {
+      stack = [...stack, ...(await detectStack())];
+    }
+
     const { data: newData, templates } = await applyMods(
-      ['angular', packageManager, 'azureCli'],
+      ['angular', packageManager, ...stack],
       data
     );
     tree.overwrite('.devcontainer/devcontainer.json', newData.json);
@@ -63,7 +73,7 @@ function applyModsRule(options: any): Rule {
   };
 }
 
-function copyExtraTemplates(options: any, templates: string[]): Rule {
+function copyExtraTemplates(options: SchemaOptions, templates: string[]): Rule {
   return (_tree: Tree, _context: SchematicContext) => {
     const templatesRules = templates.map((templatePath) => {
       const templateSource = apply(url(`${baseTemplatePath}/${templatePath}`), [
@@ -78,17 +88,20 @@ function copyExtraTemplates(options: any, templates: string[]): Rule {
   };
 }
 
-export function getPackageManager(tree: Tree): string {
-  let packageManager = getPackageManagerFromConfig(tree);
+export async function getPackageManager(
+  options: SchemaOptions,
+  tree: Tree
+): Promise<string> {
+  if (options.packageManager) {
+    return options.packageManager;
+  }
+
+  const packageManager = getPackageManagerFromConfig(tree);
   if (packageManager) {
     return packageManager;
   }
 
-  const hasYarnLock = tree.exists('yarn.lock');
-  const hasNpmLock = tree.exists('package-lock.json');
-
-  packageManager = hasYarnLock && !hasNpmLock ? 'yarn' : 'npm';
-  return packageManager;
+  return detectPackageManager();
 }
 
 function getPackageManagerFromConfig(tree: Tree): string | undefined {

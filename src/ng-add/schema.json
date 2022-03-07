@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "devc-ng-add",
+  "title": "devcontainer ng-add schematic",
+  "description": "Add .devcontainer configuration to your project",
+  "additionalProperties": false,
+  "type": "object",
+  "properties": {
+    "packageManager": {
+      "description": "The package manager to use for your project.",
+      "type": "string",
+      "enum": ["npm", "yarn", "pnpm"],
+      "alias": "p"
+    },
+    "stack": {
+      "description": "The stack to use for your project.",
+      "type": "string",
+      "alias": "s"
+    },
+    "detect": {
+      "description": "Force stack detection even if stack option is set.",
+      "type": "boolean",
+      "alias": "d"
+    }
+  }
+}
