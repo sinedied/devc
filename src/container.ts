@@ -68,9 +68,9 @@ export async function getDevContainerRunDetails(
     const configPath = path.join(devContainerPath, devcontainerConfigFile);
     const config = await readJson(configPath, true);
     let { workspacePath } = config;
-    debug('Workspace in devcontainer config: %s', workspacePath);
+    debug('Workspace in dev container config: %s', workspacePath);
     const user = config.remoteUser;
-    debug('User in devcontainer config: %s', user);
+    debug('User in dev container config: %s', user);
 
     if (!workspacePath) {
       workspacePath = await getDefaultDevContainerWorkspace(devContainerPath);

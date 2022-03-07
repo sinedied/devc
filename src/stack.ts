@@ -38,11 +38,10 @@ export function checkValidPackageManager(packageManager?: string) {
 }
 
 export async function detectPackageManager(): Promise<string> {
+  // TODO: search in subfolders?
   const hasYarnLock = await pathExists('yarn.lock');
   const hasNpmLock = await pathExists('package-lock.json');
   const hasPnpmLock = await pathExists('pnpm-lock.yaml');
-
-  // TODO: search in subfolders?
 
   if (hasPnpmLock && !hasNpmLock && !hasYarnLock) {
     return 'pnpm';

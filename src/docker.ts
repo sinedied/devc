@@ -82,21 +82,21 @@ export async function stopContainer(id: string) {
 }
 
 export async function runInDevContainer(basePath: string, command?: string) {
-  const devContainerPath = await getDevContainerRootFolder(basePath);
-  if (!devContainerPath) {
+  const devcontainerPath = await getDevContainerRootFolder(basePath);
+  if (!devcontainerPath) {
     throw new Error('.devcontainer folder not found');
   }
 
-  debug(`Devcontainer root path: ${devContainerPath}`);
+  debug(`Devcontainer root path: ${devcontainerPath}`);
 
-  const devContainer = await getDevContainer(devContainerPath);
-  if (!devContainer) {
-    throw new Error('No devcontainer found');
+  const devcontainer = await getDevContainer(devcontainerPath);
+  if (!devcontainer) {
+    throw new Error('No dev container found');
   }
 
-  if (!devContainer.running) {
-    console.log('Devcontainer is not running, starting...');
-    await startContainer(devContainer.id);
+  if (!devcontainer.running) {
+    console.log('Dev container is not running, starting...');
+    await startContainer(devcontainer.id);
   }
 
   let cmd = 'docker exec -it ';
@@ -107,7 +107,7 @@ export async function runInDevContainer(basePath: string, command?: string) {
   }
 
   cmd += `--workdir ${runDetails.workspacePath} `;
-  cmd += `${devContainer.id} `;
+  cmd += `${devcontainer.id} `;
   // TODO: allow to override the shell used
   // Example config:
   //   "settings": {
@@ -123,8 +123,8 @@ export async function runInDevContainer(basePath: string, command?: string) {
   debug(`Running: ${cmd}`);
   runInteractiveCommandSync(cmd);
 
-  if (!devContainer.running) {
-    console.log('Stopping devcontainer...');
-    await stopContainer(devContainer.id);
+  if (!devcontainer.running) {
+    console.log('Stopping dev container...');
+    await stopContainer(devcontainer.id);
   }
 }

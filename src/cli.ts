@@ -8,7 +8,7 @@ import { readJson } from './util.js';
 const help = chalk`Usage: devc [command] [options]
 
 Commands:
-  {cyan init}                Initialize devcontainer config (default command)
+  {cyan init}                Initialize dev container config (default command)
     -s, --stack <name1, name2, ...>
                       Set the stack to be used (default: autodetect)
     -p, --packageManager <npm|yarn|pnpm>
@@ -16,10 +16,10 @@ Commands:
     -d, --detect      Force stack detection even if stack option is set
     --list            List available tech stacks
 
-  {cyan code} [path]         Open folder in a VS Code devcontainer
+  {cyan code} [path]         Open folder in a VS Code dev container
     -i, --insiders    Use insiders version of VS Code
 
-  {cyan shell} [command]     Open a shell in devcontainer
+  {cyan shell} [command]     Open a shell in dev container
     -e, --exec <cmd>  Execute command in container shell
 
 General options:
