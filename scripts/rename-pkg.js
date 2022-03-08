@@ -1,7 +1,8 @@
 #!/usr/bin/env node
+
 // ***************************************************************************
 // Changes the name of a package.
-// Usage: rename-pkg.js <new-name>
+// Usage: ./rename-pkg.js <new-name>
 // ***************************************************************************
 
 const process = require('process');
@@ -9,8 +10,8 @@ const fs = require('fs');
 
 const args = process.argv.slice(2);
 if (args.length !== 1 || !args[0]) {
-  console.error('Usage: rename-pkg <new-name>');
-  process.exitCode = -1;
+  console.error('Usage: ./rename-pkg.js <new-name>');
+  process.exit(-1);
 }
 
 const pkg = JSON.parse(fs.readFileSync('package.json'));
