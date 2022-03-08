@@ -135,7 +135,7 @@ async function hasOneOfFiles(root: string, files: string[]) {
   debug('Searching for files: %O', files);
   const matches = await glob(files, {
     dot: true,
-    ignore: ['**/node_modules/**'],
+    ignore: ['**/node_modules/**', '**/.devcontainer/**/*'],
     cwd: root || undefined
   });
   debug('Found files: %O', matches);
