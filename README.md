@@ -75,6 +75,11 @@ Using the `--exec` option, you can directly execute a single command in the dev 
 
 Note: currently, the dev container must have been created in VS Code before you can use this command. Building the dev container from the command line is not (yet) supported.
 
+## Contributing
+
+Contributions are welcome! :heart:
+You can have a look at the [contributing guide](CONTRIBUTING.md) to learn how to contribute to this project.
+
 ## Related projects
 
 - https://code.visualstudio.com/docs/remote/devcontainer-cli

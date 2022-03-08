@@ -5,20 +5,37 @@ import { unique } from './util.js';
 const debug = createDebug('mod');
 
 export interface Mod {
+  // The list of dev container ports to forward to the host
   forwardPorts?: number[];
+  // The list of VS Code extensions ids to be installed in the container
+  // You can get the extension id by right-clicking on the extension in VS Code
   extensions?: string[];
+  // A command to run in the container after it's created the first time
+  // You can run multiple commands by adding && between them
   postCreateCommand?: string;
+  // The list of global NPM packages to install in the container
   globalPackages?: string[];
-  // Templates must be folder paths
+  // The list of templates folder to copy to the project
   templates?: string[];
+  // Extra container commands that will be added to the Dockerfile
   containerSetup?: string;
+  // The list of mod names to include
   includeMods?: string[];
+  // The conditions in which this mod should apply
+  // If any of these conditions is met, the mod will be applied
   applyIf?: ApplyConditions;
 }
 
 export interface ApplyConditions {
+  // NPM package names to look for
+  // If any of them is present, the mod will be applied
   packages?: string[];
+  // Files glob patterns to look for
+  // If any of them is present, the mod will be applied
   files?: string[];
+  // You can run custom code here, and return true if the mod should be applied
+  // Be mindful of the performance of this function, as it will grow the total
+  // amount of time needed to detect all mods
   condition?: () => Promise<boolean> | boolean;
 }
 
