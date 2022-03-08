@@ -78,7 +78,7 @@ export async function detectStack() {
   } else {
     console.info(
       chalk.yellow(
-        `Could not find any package.json, stack detection may be incorrect.\nPlease use --stack=<stack> to specify the stack.`
+        `Could not find any package.json, stack detection may be incorrect.`
       )
     );
   }

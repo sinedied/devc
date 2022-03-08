@@ -61,7 +61,9 @@ export async function init(options?: Partial<InitOptions>) {
 
     if (stack.length === 0 || options.detect) {
       stack = [...stack, ...(await detectStack())];
-      console.info(`Detected stack: ${chalk.cyan(stack.join(', '))}`);
+      console.info(
+        `Detected stack: ${chalk.cyan(stack.join(', ') || '<none>')}`
+      );
     } else {
       console.info(`Using stack: ${chalk.cyan(stack.join(', '))}`);
     }
