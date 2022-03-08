@@ -19,7 +19,7 @@ You can learn more about dev containers [here](https://aka.ms/vscode/devcontaine
 There are multiple ways to use the `devc` tool:
 
 - Install globally as a CLI tool: `npm install -g devc`
-- Generate a dev container configuration in a project without installing: `npm init devc` or `yarn create devc`
+- Generate a dev container configuration in a project without installing: `npm init devc` or `yarn create devc` or `pnpm create devc`
 - Add a dev container configuration to an Angular project `ng add devc`
 
 While the main use case is to generate a dev container configuration, there are also other features provided by the CLI if you install it. For example, you can run a command in a dev container (even if it's not started) or open VS Code directly in a dev container.
