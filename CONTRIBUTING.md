@@ -66,7 +66,12 @@ npm run update:mods
 
 You can now test your mod in a project you would like to use it with `devc --stack <mod_name>`.
 
-After you're finished testing, you can commit your changes and submit a pull request.
+Before committing your mod, you should run the following command to make sure your code formatting is correct and that your code is following the linter rules:
+```bash
+npm run lint:fix
+```
+
+After you're finished testing, you can finally commit your changes and submit a pull request.
 This project follow the [conventional commits](https://conventionalcommits.org) naming convention, so be sure to look at the docs if you're not familiar with this convention.
 
 Thanks for you help!
