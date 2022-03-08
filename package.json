@@ -10,6 +10,7 @@
     "build": "tsc -p tsconfig.json",
     "build:watch": "tsc -p tsconfig.json --watch",
     "build:clean": "npm run clean -s && npm run build -s",
+    "update:mods": "npm run build:clean -s && node ./scripts/update-mods.js",
     "lint": "xo",
     "lint:fix": "xo --fix",
     "test": "xo",
