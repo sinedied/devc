@@ -126,8 +126,8 @@ async function matchStacks(packageInfo: PackageInfo) {
 function hasPackage(packageJson: any, packageList: string[]) {
   return packageList.some(
     (packageName) =>
-      packageJson.dependencies[packageName] ||
-      packageJson.devDependencies[packageName]
+      packageJson.dependencies?.[packageName] ||
+      packageJson.devDependencies?.[packageName]
   );
 }
 
