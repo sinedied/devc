@@ -17,7 +17,7 @@
     "clean": "npx rimraf lib",
     "release:check": "semantic-release --dry-run",
     "prepare": "npm run build:clean -s",
-    "postpublish": "git tag -a $npm_package_version -m \"$npm_package_version\" && git push --tags"
+    "publish:create-devc": "node ./scripts/rename-pkg.js create-devc && npm publish"
   },
   "repository": {
     "type": "git",
