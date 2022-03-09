@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import createDebug from 'debug';
 import { openCodeWithDevContainer } from '../container.js';
 
@@ -17,5 +18,10 @@ export async function code(options?: Partial<OpenOptions>) {
     // TODO: use gh cli?
   }
 
-  await openCodeWithDevContainer(options.path ?? '.', options.insiders);
+  try {
+    await openCodeWithDevContainer(options.path ?? '.', options.insiders);
+  } catch (error: unknown) {
+    process.exitCode = -1;
+    console.error(chalk.red(`Error: ${(error as Error).message}`));
+  }
 }

@@ -1,4 +1,5 @@
 import process from 'process';
+import chalk from 'chalk';
 import createDebug from 'debug';
 import { runInDevContainer } from '../docker.js';
 
@@ -12,5 +13,10 @@ export async function shell(options?: Partial<ShellOptions>) {
   options = options ?? {};
   debug('Options: %o', options);
 
-  await runInDevContainer(process.cwd(), options.exec);
+  try {
+    await runInDevContainer(process.cwd(), options.exec);
+  } catch (error: unknown) {
+    process.exitCode = -1;
+    console.error(chalk.red(`Error: ${(error as Error).message}`));
+  }
 }
