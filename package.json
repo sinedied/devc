@@ -1,6 +1,6 @@
 {
   "name": "devc",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Quickly add .devcontainer configuration to any JavaScript project, and more!",
   "bin": {
     "devc": "./bin/devc.js"
