@@ -82,5 +82,6 @@ You can have a look at the [contributing guide](CONTRIBUTING.md) to learn how to
 
 ## Related projects
 
+- https://github.com/microsoft/dev-container-spec
 - https://code.visualstudio.com/docs/remote/devcontainer-cli
 - https://github.com/stuartleeks/devcontainer-cli/
