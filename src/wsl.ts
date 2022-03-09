@@ -19,9 +19,15 @@ async function convertWindowsPathToWslPath(path: string) {
   return runCommand(`wslpath -u ${path}`);
 }
 
-export async function convertToWindowsPathIfNeeded(path: string) {
+export async function convertToWindowsPathIfNeeded(
+  path: string,
+  escapeBackslashes = false
+) {
   if (isWsl() && !hasWslPathPrefix(path)) {
-    return convertWslPathToWindowsPath(path);
+    path = await convertWslPathToWindowsPath(path);
+    if (escapeBackslashes) {
+      return path.replace(/\\/g, '\\\\');
+    }
   }
 
   return path;

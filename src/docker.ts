@@ -48,7 +48,7 @@ export async function getDevContainer(
 }
 
 async function listDevContainersIds(projectPath: string): Promise<string[]> {
-  projectPath = await convertToWindowsPathIfNeeded(projectPath);
+  projectPath = await convertToWindowsPathIfNeeded(projectPath, true);
   const command = `docker ps -q -a --filter label=vsch.local.folder="${projectPath}"`;
   debug(`Running: ${command}`);
 
