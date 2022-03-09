@@ -4,6 +4,7 @@ import {
   getDevContainerRunDetails
 } from './container.js';
 import { runCommand, runInteractiveCommandSync } from './util.js';
+import { convertToWindowsPathIfNeeded } from './wsl.js';
 
 const debug = createDebug('docker');
 
@@ -47,6 +48,7 @@ export async function getDevContainer(
 }
 
 async function listDevContainersIds(projectPath: string): Promise<string[]> {
+  projectPath = await convertToWindowsPathIfNeeded(projectPath);
   const command = `docker ps -q -a --filter label=vsch.local.folder="${projectPath}"`;
   debug(`Running: ${command}`);
 

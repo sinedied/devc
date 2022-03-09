@@ -1,3 +1,4 @@
+import process from 'process';
 import chalk from 'chalk';
 import createDebug from 'debug';
 import { openCodeWithDevContainer } from '../container.js';

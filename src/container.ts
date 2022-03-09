@@ -11,6 +11,11 @@ import {
   recursiveCopy,
   supportsBinary
 } from './util.js';
+import {
+  convertToWindowsPathIfNeeded,
+  convertToWslPathIfNeeded,
+  isWsl
+} from './wsl.js';
 
 export interface DevContainerRunDetails {
   workspacePath: string;
@@ -38,9 +43,12 @@ export async function openCodeWithDevContainer(
   const codeBin = insiders ? 'code-insiders' : 'code';
 
   if (!(await supportsBinary(codeBin))) {
-    throw new Error(
-      `${codeBin} is not installed.\nIn VS Code, run the command "Shell Command: Install 'code' command in PATH."`
-    );
+    let message = `${codeBin} is not installed.\n`;
+    message += isWsl()
+      ? 'Run the command "code" in a terminal to install it first.'
+      : `In VS Code, run the command "Shell Command: Install 'code' command in PATH".`;
+
+    throw new Error(message);
   }
 
   const workspace = await getDevContainerWorkspace(projectPath);
@@ -57,8 +65,9 @@ export async function getDevContainerRootFolder(basePath: string) {
 export async function getDevContainerRunDetails(
   projectPath: string
 ): Promise<DevContainerRunDetails> {
-  // TODO: check projectPath compatibility with WSL
   try {
+    projectPath = await convertToWslPathIfNeeded(projectPath);
+
     const devContainerPath = await getDevContainerRootFolder(projectPath);
     if (!devContainerPath) {
       throw new Error('.devcontainer folder not found');
@@ -110,9 +119,10 @@ async function createDevContainerLaunchUri(
   workspace: string
 ) {
   const absolutePath = path.resolve(projectPath);
-  debug('Project path: %s', absolutePath);
+  const launchPath = await convertToWindowsPathIfNeeded(absolutePath);
+  debug('Project path: %s', launchPath);
 
-  return `${remoteUri}${toHex(absolutePath)}${workspace}`;
+  return `${remoteUri}${toHex(launchPath)}${workspace}`;
 }
 
 function toHex(string: string) {
