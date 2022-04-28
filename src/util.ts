@@ -41,14 +41,17 @@ export async function recursiveCopy(
   }
 }
 
-export function stripJsonComment(json: string) {
-  return json.replace(/(\/\/.*|\/\*[\s\S]*?\*\/)/g, '');
+export function stripJsonComments(json: string) {
+  return json.replace(
+    /\\"|"(?:\\"|[^"])*"|(\/\/.*|\/\*[\s\S]*?\*\/)/gm,
+    (match, group) => (group ? '' : match)
+  );
 }
 
 export async function readJson(path: string, stripComments = false) {
   let contents = await fs.readFile(path, 'utf8');
   if (stripComments) {
-    contents = stripJsonComment(contents);
+    contents = stripJsonComments(contents);
   }
 
   return JSON.parse(contents) as Record<string, any>;
