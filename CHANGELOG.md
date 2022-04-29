@@ -1,3 +1,10 @@
+## [0.2.1](https://github.com/sinedied/devc/compare/0.2.0...0.2.1) (2022-04-29)
+
+
+### Bug Fixes
+
+* strip json comments not working in some cases ([6f8f937](https://github.com/sinedied/devc/commit/6f8f937e1ddd131c40830acf1c2f76a4ecb07113))
+
 # [0.2.0](https://github.com/sinedied/devc/compare/0.1.1...0.2.0) (2022-03-09)
 
 
