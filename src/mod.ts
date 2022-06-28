@@ -97,8 +97,8 @@ export async function applyMods(
 
   if (extensions.length > 0) {
     newData.json = newData.json.replace(
-      `"extensions": [],`,
-      `"extensions": [${extensions.map((ex) => `"${ex}"`).join(', ')}],`
+      `"extensions": []`,
+      `"extensions": [${extensions.map((ex) => `"${ex}"`).join(', ')}]`
     );
   }
 
