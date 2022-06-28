@@ -1,3 +1,10 @@
+# [0.3.0](https://github.com/sinedied/devc/compare/0.2.1...0.3.0) (2022-06-28)
+
+
+### Features
+
+* update devcontainer.json to latest spec ([9ac1e13](https://github.com/sinedied/devc/commit/9ac1e13e872b8ebf6d2aa1439a8ca71639c14222))
+
 ## [0.2.1](https://github.com/sinedied/devc/compare/0.2.0...0.2.1) (2022-04-29)
 
 
