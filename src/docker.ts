@@ -53,7 +53,7 @@ async function listDevContainersIds(projectPath: string): Promise<string[]> {
   debug(`Running: ${command}`);
 
   const result = await runCommand(command);
-  return result.split('\n').filter((id) => id);
+  return result.split('\n').filter(Boolean);
 }
 
 async function inspectDevContainer(id: string): Promise<DevContainerInfo> {
